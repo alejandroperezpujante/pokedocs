@@ -11,10 +11,10 @@
   },
   "dependencies": {
     "@headlessui/vue": "^1.5.0",
-    "@supabase/supabase-js": "^1.31.1",
-    "pinia": "^2.0.11",
+    "axios": "^0.26.1",
+    "pinia": "^2.0.12",
     "vue": "^3.2.31",
-    "vue-router": "^4.0.12"
+    "vue-router": "^4.0.14"
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.1.0",
