@@ -30,5 +30,5 @@ import { Switch, SwitchGroup, SwitchLabel } from "@headlessui/vue";
 import AuthRegister from "@/components/Auth/AuthRegister.vue";
 import AuthLogin from "@/components/Auth/AuthLogin.vue";
 
-const mode = ref(false);
+const mode = ref<boolean>(false);
 </script>

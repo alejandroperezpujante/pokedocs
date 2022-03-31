@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useUserStore } from "@/stores/user";
+import { useAuthStore } from "@/stores/auth";
 import SearchView from "@/views/SearchView.vue";
 import AuthView from "@/views/AuthView.vue";
 
@@ -37,7 +37,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to) => {
-  const user = useUserStore();
+  const user = useAuthStore();
   if (to.meta.requiresAuth && !user.token) {
     router.push("/auth");
   }

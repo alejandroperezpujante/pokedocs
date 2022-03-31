@@ -1,5 +1,5 @@
 <template>
-  <header class="flex flex-col items-center">
+  <header class="flex flex-col items-center mt-6">
     <HeaderTitle />
     <HeaderNav />
   </header>

@@ -2,14 +2,18 @@ import { defineStore } from "pinia";
 import router from "@/router";
 
 interface State {
-  username: string;
-  token: string | null;
+  name: undefined | string;
+  username: undefined | string;
+  email: undefined | string;
+  token: undefined | string;
 }
 
-export const useUserStore = defineStore("user", {
+export const useAuthStore = defineStore("user", {
   state: (): State => ({
-    username: "",
-    token: null,
+    name: "",
+    username: "Alex",
+    email: "",
+    token: "asdasd",
   }),
   actions: {
     async logIn() {
@@ -19,7 +23,7 @@ export const useUserStore = defineStore("user", {
     },
     async logOut() {
       this.username = "";
-      this.token = null;
+      this.token = undefined;
       router.push("/auth");
     },
   },
