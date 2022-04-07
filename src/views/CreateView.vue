@@ -1,7 +1,3 @@
 <template>
-  <main>
-    <h1>This is the create view</h1>
-  </main>
+  <h1>Create view</h1>
 </template>
-
-<script setup lang="ts"></script>

@@ -1,22 +1,36 @@
 import { createRouter, createWebHistory } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import SearchView from "@/views/SearchView.vue";
-import AuthView from "@/views/AuthView.vue";
+import { firebaseAuth } from "@/firebase";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: "/",
+      redirect: { name: "about" },
+    },
+    {
+      path: "/search",
       name: "search",
-      component: SearchView,
-      meta: { requiresAuth: true },
+      component: () => import("@/views/SearchView.vue"),
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: "/create",
       name: "create",
       component: () => import("@/views/CreateView.vue"),
-      meta: { requiresAuth: true },
+      meta: {
+        requiresAuth: true,
+      },
+    },
+    {
+      path: "/profile",
+      name: "profile",
+      component: () => import("@/views/ProfileView.vue"),
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: "/about",
@@ -24,10 +38,16 @@ const router = createRouter({
       component: () => import("@/views/AboutView.vue"),
     },
     {
-      path: "/auth",
-      name: "auth",
-      component: AuthView,
+      path: "/register",
+      name: "register",
+      component: () => import("@/views/RegisterView.vue"),
     },
+    {
+      path: "/login",
+      name: "login",
+      component: () => import("@/views/LoginView.vue"),
+    },
+
     {
       path: "/:pathMatch(.*)*",
       name: "NotFound",
@@ -36,10 +56,14 @@ const router = createRouter({
   ],
 });
 
-router.beforeEach((to) => {
-  const user = useAuthStore();
-  if (to.meta.requiresAuth && !user.token) {
-    router.push("/auth");
+router.beforeEach((to, from, next) => {
+  if (
+    to.matched.some((record) => record.meta.requiresAuth) &&
+    !firebaseAuth.currentUser
+  ) {
+    next("/login");
+  } else {
+    next();
   }
 });
 

@@ -1,3 +1,3 @@
 <template>
-  <h1 class="text-6xl font-semibold text-red-500">PokeDocs</h1>
+  <h1 class="text-5xl font-bold text-red-600">PokeDocs</h1>
 </template>
