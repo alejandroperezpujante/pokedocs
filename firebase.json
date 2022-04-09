@@ -1,13 +1,16 @@
 {
   "emulators": {
+    "ui": {
+      "enabled": true
+    },
     "auth": {
       "port": 9099
     },
     "firestore": {
       "port": 8080
     },
-    "ui": {
-      "enabled": true
+    "storage": {
+      "port": 9199
     },
     "hosting": {
       "host": "localhost",

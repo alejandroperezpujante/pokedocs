@@ -1,6 +1,6 @@
 <template>
   <main class="grid gap-24">
-    <div class="grid gap-4">
+    <div class="grid gap-4 m-6">
       <h1 class="text-5xl">Welcome, {{ displayName }}</h1>
       <form @submit.prevent="handleEmailUpdate">
         <div class="flex items-center w-full">
@@ -12,7 +12,7 @@
             type="email"
             placeholder="Email"
             autocomplete="email"
-            class="block w-full"
+            class="block w-full border-0 border-b-2 border-purple-400"
             v-model="email"
           />
           <div class="ml-auto">
@@ -21,8 +21,8 @@
               :class="{
                 'opacity-50': email === authStore.user?.email,
               }"
-              :disabled="email === authStore.user?.email"
               class="p-2 ml-2 text-white transition bg-purple-400 rounded-lg hover:cursor-pointer hover:scale-105"
+              :disabled="email === authStore.user?.email"
               value="Change email"
             />
           </div>
@@ -39,7 +39,7 @@
             type="text"
             placeholder="username"
             autocomplete="username"
-            class="block w-full"
+            class="block w-full border-0 border-b-2 border-purple-400"
             maxlength="21"
             v-model="displayName"
           />
@@ -48,9 +48,9 @@
               type="submit"
               :class="{
                 'opacity-50': displayName === authStore.user?.displayName,
-                disabled: displayName === authStore.user?.displayName,
               }"
               class="p-2 ml-2 text-white transition bg-purple-400 rounded-lg hover:cursor-pointer hover:scale-105"
+              :disabled="displayName === authStore.user?.displayName"
               value="Change username"
             />
           </div>
@@ -60,7 +60,7 @@
       <form @submit.prevent="handleUpdatePassword">
         <div class="flex items-center w-full">
           <LockClosedIcon class="inline-block h-5 mr-1" />
-          <div class="flex gap-1">
+          <div class="flex flex-col gap-2 sm:flex-row">
             <label for="currentPassword" class="sr-only"></label>
             <input
               id="currentPassword"
@@ -68,7 +68,7 @@
               type="password"
               placeholder="Current Password"
               autocomplete="current-password"
-              class="block w-full"
+              class="block w-full border-0 border-b-2 border-purple-400"
               v-model="currentPassword"
             />
             <label for="newPassword" class="sr-only"></label>
@@ -78,7 +78,7 @@
               type="password"
               placeholder="New Password"
               autocomplete="new-password"
-              class="block w-full"
+              class="block w-full border-0 border-b-2 border-purple-400"
               v-model="newPassword"
             />
           </div>
@@ -87,9 +87,9 @@
               type="submit"
               :class="{
                 'opacity-50': !currentPassword || !newPassword,
-                disabled: !currentPassword || !newPassword,
               }"
               class="p-2 ml-2 text-white transition bg-purple-400 rounded-lg hover:cursor-pointer hover:scale-105"
+              :disabled="!currentPassword || !newPassword"
               value="Change password"
             />
           </div>
@@ -103,16 +103,29 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { AtSymbolIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/solid";
 
+onMounted(() => {
+  watch(
+    () => authStore.user,
+    (user) => {
+      if (user) {
+        displayName.value = user.displayName;
+        email.value = user.email;
+      }
+    },
+    { immediate: true }
+  );
+}); 
+
 const authStore = useAuthStore();
 
-const email = ref(authStore.user?.email);
-const displayName = ref(authStore.user?.displayName);
-const currentPassword = ref(undefined);
-const newPassword = ref(undefined);
+const email = ref();
+const displayName = ref();
+const currentPassword = ref();
+const newPassword = ref();
 
 const handleEmailUpdate = () => {
   email.value && email.value !== authStore.user?.email

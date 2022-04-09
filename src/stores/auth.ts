@@ -13,13 +13,17 @@ import {
   type User,
 } from "@firebase/auth";
 
+interface userData {
+  user: User | null;
+}
+
 export const useAuthStore = defineStore({
-  id: "counter",
-  state: () => ({
-    user: null as User | null,
+  id: "auth",
+  state: (): userData => ({
+    user: null
   }),
   actions: {
-    setUser(user: User | null) {
+    setUser(user: User) {
       this.user = user;
     },
     clearUser() {
@@ -44,8 +48,8 @@ export const useAuthStore = defineStore({
             return "Email or password was incorrect";
         }
       }
-      this.setUser(firebaseAuth.currentUser);
-      router.push("/search");
+      this.setUser(firebaseAuth.currentUser as User);
+      router.push("/profile");
     },
     async registerWithEmailAndPassword(registerData: {
       email: string;
@@ -54,6 +58,7 @@ export const useAuthStore = defineStore({
       const { email, password } = registerData;
       try {
         await createUserWithEmailAndPassword(firebaseAuth, email, password);
+        router.push("/profile");
       } catch (error) {
         switch (error) {
           case "auth/email-already-in-use":
@@ -68,13 +73,14 @@ export const useAuthStore = defineStore({
             return "Email or password was incorrect";
         }
       }
-      this.setUser(firebaseAuth.currentUser);
+      this.setUser(firebaseAuth.currentUser as User);
       router.push("/search");
     },
     async logInWithGoogle() {
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(firebaseAuth, provider);
+        router.push("/profile");
       } catch (error) {
         alert(error);
       }
@@ -107,23 +113,17 @@ export const useAuthStore = defineStore({
         alert(error);
       }
     },
-    fetchUser() {
-      firebaseAuth.onAuthStateChanged(async (user) => {
-        if (user === null) {
-          this.clearUser();
+    async fetchUser() {
+      firebaseAuth.onAuthStateChanged(async user => {
+        if (!user) {
+          this.clearUser;
         } else {
           this.setUser(user);
-          if (
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            router.isReady() &&
-            (router.currentRoute.value.path === "/login" ||
-              router.currentRoute.value.path === "/register")
-          ) {
-            router.push("/profile");
+          if (router.currentRoute.value.path === '/login' || router.currentRoute.value.path === '/register') {
+            router.push('/search')
           }
         }
-      });
-    },
-  },
+      })
+    }
+  }
 });

@@ -16,8 +16,11 @@
   },
   "dependencies": {
     "@heroicons/vue": "^1.0.6",
+    "@tailwindcss/forms": "^0.5.0",
+    "axios": "^0.26.1",
     "firebase": "^9.6.10",
     "pinia": "^2.0.13",
+    "pokenode-ts": "^1.13.0",
     "vue": "^3.2.31",
     "vue-router": "^4.0.14"
   },

@@ -1,9 +1,9 @@
 <template>
   <main class="grid gap-6">
-    <Transition>
+    <Transition name="errorTip">
       <div
         v-if="isLogInError"
-        class="grid p-4 mb-12 text-white bg-red-500 rounded-lg absolute top-[25%] place-content-center"
+        class="absolute left-0 right-0 px-4 py-2 mx-auto text-center text-white bg-red-500 rounded-lg bottom-3/4 w-fit"
       >
         <p>{{ logInErrorMessage }}</p>
       </div>
@@ -20,12 +20,12 @@
         <label for="email" class="sr-only"></label>
         <AtSymbolIcon class="inline-block mr-1 h-7" />
         <input
-          class="w-full"
           id="email"
           name="email"
           type="email"
           placeholder="Email"
           autocomplete="email"
+          class="w-full border-0 focus:ring-0"
           v-model="registerData.email"
         />
       </div>
@@ -38,6 +38,7 @@
           type="password"
           placeholder="Password"
           autocomplete="new-password"
+          class="border-0 focus:ring-0"
           v-model="registerData.password"
           ref="passwordInput"
         />
@@ -123,5 +124,20 @@ div {
 
 input:focus {
   outline: none;
+}
+
+.errorTip-enter-active,
+.errorTip-leave-active {
+  transition: all 0.3s ease-in-out;
+}
+
+.errorTip-enter-from {
+  transform: translateY(20px);
+  opacity: 0;
+}
+
+.errorTip-leave-to {
+  transform: translateY(-20px);
+  opacity: 0;
 }
 </style>

@@ -1,9 +1,9 @@
 <template>
   <main class="grid gap-y-6">
-    <Transition>
+    <Transition name="errorTip">
       <div
         v-if="isLogInError"
-        class="grid p-4 mb-12 text-white bg-red-500 rounded-lg absolute top-[25%] place-content-center"
+        class="absolute left-0 right-0 px-4 py-2 mx-auto text-center text-white bg-red-500 rounded-lg bottom-3/4 w-fit"
       >
         <p>{{ logInErrorMessage }}</p>
       </div>
@@ -20,11 +20,11 @@
         <label for="email" class="sr-only"></label>
         <AtSymbolIcon class="inline-block mr-1 h-7" />
         <input
-          class="w-full"
           id="email"
           name="email"
           type="email"
           placeholder="Email"
+          class="w-full border-0 focus:ring-0"
           autocomplete="email"
           v-model="loginData.email"
         />
@@ -38,6 +38,7 @@
           type="password"
           placeholder="Password"
           autocomplete="new-password"
+          class="border-0 focus:ring-0"
           v-model="loginData.password"
           ref="passwordInput"
         />
@@ -79,10 +80,10 @@ const loginData = ref({
   email: "",
   password: "",
 });
-const showPassword = ref<boolean>(false);
+const showPassword = ref(false);
 const passwordInput = ref();
-const isLogInError = ref<boolean>(false);
-const logInErrorMessage = ref<string | undefined>(undefined);
+const isLogInError = ref(false);
+const logInErrorMessage = ref();
 
 const changePasswordVisibility = (): void => {
   showPassword.value = !showPassword.value;
@@ -123,17 +124,17 @@ input:focus {
   outline: none;
 }
 
-.v-enter-active,
-.v-leave-active {
+.errorTip-enter-active,
+.errorTip-leave-active {
   transition: all 0.3s ease-in-out;
 }
 
-.v-enter-from {
+.errorTip-enter-from {
   transform: translateY(20px);
   opacity: 0;
 }
 
-.v-leave-to {
+.errorTip-leave-to {
   transform: translateY(-20px);
   opacity: 0;
 }
