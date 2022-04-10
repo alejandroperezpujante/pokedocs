@@ -1,5 +1,5 @@
 <template>
-  <main class="grid gap-12">
+  <main class="grid gap-12 p-4">
     <Transition name="errorTip">
       <div
         v-if="isSearchError"
@@ -109,7 +109,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useSearchStore } from "@/firebase/search";
+import { useSearchStore } from "@/stores/SearchStore";
 
 const searchStore = useSearchStore();
 

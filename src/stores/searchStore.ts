@@ -2,18 +2,16 @@ import { defineStore } from "pinia";
 import { PokemonClient } from "pokenode-ts";
 
 interface searchResult {
-  searchResults:
-    | null
-    | {
-        id: number;
-        name: string;
-        height: number;
-        weight: number;
-        abilities: string[];
-        stats: { name: string; base_stat: number }[];
-        types: string[];
-        sprite: string | null;
-      };
+  searchResults: null | {
+    id: number;
+    name: string;
+    height: number;
+    weight: number;
+    abilities: string[];
+    stats: { name: string; base_stat: number }[];
+    types: string[];
+    sprite: string | null;
+  };
 }
 
 export const useSearchStore = defineStore({

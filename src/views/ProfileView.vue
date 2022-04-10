@@ -28,7 +28,6 @@
           </div>
         </div>
       </form>
-      <hr class="w-3/4 mx-auto border rounded-full" />
       <form @submit.prevent="handleDisplayNameUpdate">
         <div class="flex items-center w-full">
           <UserIcon class="inline-block mr-1 h-7" />
@@ -56,7 +55,6 @@
           </div>
         </div>
       </form>
-      <hr class="w-3/4 mx-auto border rounded-full" />
       <form @submit.prevent="handleUpdatePassword">
         <div class="flex items-center w-full">
           <LockClosedIcon class="inline-block h-5 mr-1" />
@@ -104,7 +102,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/authStore";
 import { AtSymbolIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/solid";
 
 onMounted(() => {
@@ -118,7 +116,7 @@ onMounted(() => {
     },
     { immediate: true }
   );
-}); 
+});
 
 const authStore = useAuthStore();
 

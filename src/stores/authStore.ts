@@ -17,10 +17,15 @@ interface userData {
   user: User | null;
 }
 
+interface authFormData {
+  email: string;
+  password: string;
+}
+
 export const useAuthStore = defineStore({
   id: "auth",
   state: (): userData => ({
-    user: null
+    user: null,
   }),
   actions: {
     setUser(user: User) {
@@ -29,13 +34,12 @@ export const useAuthStore = defineStore({
     clearUser() {
       this.user = null;
     },
-    async loginWithEmailAndPassword(loginData: {
-      email: string;
-      password: string;
-    }) {
+    async loginWithEmailAndPassword(loginData: authFormData) {
       const { email, password } = loginData;
       try {
         await signInWithEmailAndPassword(firebaseAuth, email, password);
+        this.setUser(firebaseAuth.currentUser as User);
+        router.push("/profile");
       } catch (error) {
         switch (error) {
           case "auth/missing-email":
@@ -48,16 +52,13 @@ export const useAuthStore = defineStore({
             return "Email or password was incorrect";
         }
       }
-      this.setUser(firebaseAuth.currentUser as User);
-      router.push("/profile");
     },
-    async registerWithEmailAndPassword(registerData: {
-      email: string;
-      password: string;
-    }) {
+    async registerWithEmailAndPassword(registerData: authFormData) {
       const { email, password } = registerData;
       try {
         await createUserWithEmailAndPassword(firebaseAuth, email, password);
+        this.setUser(firebaseAuth.currentUser as User);
+        console.log(this.user);
         router.push("/profile");
       } catch (error) {
         switch (error) {
@@ -73,17 +74,16 @@ export const useAuthStore = defineStore({
             return "Email or password was incorrect";
         }
       }
-      this.setUser(firebaseAuth.currentUser as User);
-      router.push("/search");
     },
-    async logInWithGoogle() {
+    async authWithGoogle() {
       const provider = new GoogleAuthProvider();
       try {
         await signInWithPopup(firebaseAuth, provider);
-        router.push("/profile");
       } catch (error) {
         alert(error);
       }
+      this.setUser(firebaseAuth.currentUser as User);
+      router.push("/profile");
     },
     async logout() {
       await signOut(firebaseAuth);
@@ -114,16 +114,19 @@ export const useAuthStore = defineStore({
       }
     },
     async fetchUser() {
-      firebaseAuth.onAuthStateChanged(async user => {
+      firebaseAuth.onAuthStateChanged(async (user) => {
         if (!user) {
           this.clearUser;
         } else {
           this.setUser(user);
-          if (router.currentRoute.value.path === '/login' || router.currentRoute.value.path === '/register') {
-            router.push('/search')
+          if (
+            router.currentRoute.value.path === "/login" ||
+            router.currentRoute.value.path === "/register"
+          ) {
+            router.push("/search");
           }
         }
-      })
-    }
-  }
+      });
+    },
+  },
 });

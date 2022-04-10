@@ -1,7 +1,5 @@
-import {
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/authStore";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -49,6 +47,19 @@ const router = createRouter({
       component: () => import("@/views/NotFound.vue"),
     },
   ],
+});
+
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresAuth) {
+    const authStore = useAuthStore();
+    if (!authStore.user) {
+      next("/login");
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
 });
 
 export default router;
