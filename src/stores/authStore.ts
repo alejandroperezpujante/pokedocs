@@ -15,6 +15,7 @@ import {
 
 interface userData {
   user: User | null;
+  isAuthenticating: boolean;
 }
 
 interface authFormData {
@@ -26,6 +27,7 @@ export const useAuthStore = defineStore({
   id: "auth",
   state: (): userData => ({
     user: null,
+    isAuthenticating: false,
   }),
   actions: {
     setUser(user: User) {
@@ -37,6 +39,7 @@ export const useAuthStore = defineStore({
     async loginWithEmailAndPassword(loginData: authFormData) {
       const { email, password } = loginData;
       try {
+        this.isAuthenticating = true;
         await signInWithEmailAndPassword(firebaseAuth, email, password);
         this.setUser(firebaseAuth.currentUser as User);
         router.push("/profile");
@@ -51,14 +54,16 @@ export const useAuthStore = defineStore({
           default:
             return "Email or password was incorrect";
         }
+      } finally {
+        this.isAuthenticating = false;
       }
     },
     async registerWithEmailAndPassword(registerData: authFormData) {
       const { email, password } = registerData;
       try {
+        this.isAuthenticating = true;
         await createUserWithEmailAndPassword(firebaseAuth, email, password);
         this.setUser(firebaseAuth.currentUser as User);
-        console.log(this.user);
         router.push("/profile");
       } catch (error) {
         switch (error) {
@@ -73,17 +78,22 @@ export const useAuthStore = defineStore({
           default:
             return "Email or password was incorrect";
         }
+      } finally {
+        this.isAuthenticating = false;
       }
     },
     async authWithGoogle() {
       const provider = new GoogleAuthProvider();
       try {
+        this.isAuthenticating = true;
         await signInWithPopup(firebaseAuth, provider);
+        this.setUser(firebaseAuth.currentUser as User);
+        router.push("/profile");
       } catch (error) {
         alert(error);
+      } finally {
+        this.isAuthenticating = false;
       }
-      this.setUser(firebaseAuth.currentUser as User);
-      router.push("/profile");
     },
     async logout() {
       await signOut(firebaseAuth);
@@ -117,13 +127,14 @@ export const useAuthStore = defineStore({
       firebaseAuth.onAuthStateChanged(async (user) => {
         if (!user) {
           this.clearUser;
+          router.push("/about");
         } else {
           this.setUser(user);
           if (
             router.currentRoute.value.path === "/login" ||
             router.currentRoute.value.path === "/register"
           ) {
-            router.push("/search");
+            router.push("/profile");
           }
         }
       });

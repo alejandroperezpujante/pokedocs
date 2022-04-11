@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { PokemonClient } from "pokenode-ts";
 
 interface searchResult {
+  isSearching: boolean;
   searchResults: null | {
     id: number;
     name: string;
@@ -18,26 +19,34 @@ export const useSearchStore = defineStore({
   id: "search",
   state: (): searchResult => ({
     searchResults: null,
+    isSearching: false,
   }),
   actions: {
     async searchPokeApi(pokemonName: string) {
-      const client = new PokemonClient({
-        cacheOptions: { maxAge: 10000, exclude: { query: false } },
-      });
-      const response = await client.getPokemonByName(pokemonName);
-      this.searchResults = {
-        id: response.id,
-        name: response.name,
-        height: response.height,
-        weight: response.weight,
-        abilities: response.abilities.map((ability) => ability.ability.name),
-        stats: response.stats.map((stat) => ({
-          name: stat.stat.name,
-          base_stat: stat.base_stat,
-        })),
-        types: response.types.map((type) => type.type.name),
-        sprite: response.sprites.front_shiny,
-      };
+      try {
+        this.isSearching = true;
+        const client = new PokemonClient({
+          cacheOptions: { maxAge: 10000, exclude: { query: false } },
+        });
+        const response = await client.getPokemonByName(pokemonName);
+        this.searchResults = {
+          id: response.id,
+          name: response.name,
+          height: response.height,
+          weight: response.weight,
+          abilities: response.abilities.map((ability) => ability.ability.name),
+          stats: response.stats.map((stat) => ({
+            name: stat.stat.name,
+            base_stat: stat.base_stat,
+          })),
+          types: response.types.map((type) => type.type.name),
+          sprite: response.sprites.front_shiny,
+        };
+      } catch (error) {
+        console.log(error);
+      } finally {
+        this.isSearching = false;
+      }
     },
   },
 });
