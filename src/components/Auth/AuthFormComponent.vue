@@ -10,7 +10,20 @@
         placeholder="Email"
         autocomplete="email"
         class="w-full border-0 focus:ring-0"
-        v-model="formData.email"
+        v-model="formEmail"
+      />
+    </div>
+    <div v-if="mode === 'register'" class="rounded">
+      <label for="username" class="sr-only"></label>
+      <UserAddIcon class="inline-block mr-1 h-7" />
+      <input
+        id="username"
+        name="username"
+        type="text"
+        placeholder="Username"
+        autocomplete="username"
+        class="w-full border-0 focus:ring-0"
+        v-model="formUsername"
       />
     </div>
     <div>
@@ -23,7 +36,7 @@
         placeholder="Password"
         autocomplete="new-password"
         class="border-0 focus:ring-0"
-        v-model="formData.password"
+        v-model="formPassword"
       />
       <EyeIcon
         v-if="showPassword"
@@ -58,6 +71,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { useErrorStore } from "@/stores/errorStore";
 import {
   AtSymbolIcon,
+  UserAddIcon,
   LockClosedIcon,
   EyeIcon,
   EyeOffIcon,
@@ -70,15 +84,23 @@ const props = defineProps<{
   mode: string;
 }>();
 
-const formData = ref({
-  email: "",
-  password: "",
-});
+const formEmail = ref<string>("");
+const formUsername = ref<string>("");
+const formPassword = ref<string>("");
 const showPassword = ref<boolean>(false);
 
 const verifyFormData = (): boolean => {
-  if (!formData.value.email || !formData.value.password) {
-    errorStore.displayError("Please fill out all fields");
+  if (
+    props.mode === "register" &&
+    !formEmail.value &&
+    !formUsername.value &&
+    !formPassword.value
+  ) {
+    errorStore.setError("Please fill out all fields.");
+    return false;
+  }
+  if (props.mode === "login" && !formEmail.value && !formPassword.value) {
+    errorStore.setError("Please fill out all fields.");
     return false;
   }
   return true;
@@ -87,16 +109,19 @@ const verifyFormData = (): boolean => {
 const handleAuthForm = async () => {
   if (verifyFormData()) {
     if (props.mode === "register") {
-      const response = await authStore.registerWithEmailAndPassword(
-        formData.value
-      );
-      if (response) errorStore.displayError(response);
+      const formData = {
+        email: formEmail.value,
+        username: formUsername.value,
+        password: formPassword.value,
+      };
+      await authStore.registerWithEmailAndPassword(formData);
     }
     if (props.mode === "login") {
-      const response = await authStore.loginWithEmailAndPassword(
-        formData.value
-      );
-      if (response) errorStore.displayError(response);
+      const formData = {
+        email: formEmail.value,
+        password: formPassword.value,
+      };
+      await authStore.loginWithEmailAndPassword(formData);
     }
   }
 };
