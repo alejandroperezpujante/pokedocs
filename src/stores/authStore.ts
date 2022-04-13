@@ -1,24 +1,31 @@
 import { defineStore } from "pinia";
-import router from "@/router";
 import { firebaseAuth } from "@/firebase";
+import router from "@/router";
+import { useErrorStore } from "@/stores/errorStore";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  signOut,
   updateEmail,
-  updateProfile,
   updatePassword,
+  updateProfile,
+  signOut,
   type User,
 } from "@firebase/auth";
+import { FirebaseError } from "@firebase/util";
 
 interface userData {
   user: User | null;
   isAuthenticating: boolean;
 }
 
-interface authFormData {
+interface registerFormData {
+  email: string;
+  username: string;
+  password: string;
+}
+interface logInFormData {
   email: string;
   password: string;
 }
@@ -36,7 +43,7 @@ export const useAuthStore = defineStore({
     clearUser() {
       this.user = null;
     },
-    async loginWithEmailAndPassword(loginData: authFormData) {
+    async loginWithEmailAndPassword(loginData: logInFormData) {
       const { email, password } = loginData;
       try {
         this.isAuthenticating = true;
@@ -44,39 +51,53 @@ export const useAuthStore = defineStore({
         this.setUser(firebaseAuth.currentUser as User);
         router.push("/profile");
       } catch (error) {
-        switch (error) {
-          case "auth/missing-email":
-            return "Please enter an email address";
-          case "auth/wrong-password":
-            return "Incorrect password";
-          case "auth/invalid-email":
-            return "Invalid email";
-          default:
-            return "Email or password was incorrect";
+        const errorStore = useErrorStore();
+        if (error instanceof FirebaseError) {
+          switch (error.code) {
+            case "auth/missing-email":
+              errorStore.displayError("Please enter an email address");
+              break;
+            case "auth/wrong-password":
+              errorStore.displayError("Incorrect password");
+              break;
+            case "auth/user-not-found":
+              errorStore.displayError("This email address is not registered");
+              break;
+            default:
+              errorStore.displayError("Email or password was incorrect");
+              break;
+          }
+        } else {
+          errorStore.displayError("An unknown error occurred");
         }
       } finally {
         this.isAuthenticating = false;
       }
     },
-    async registerWithEmailAndPassword(registerData: authFormData) {
-      const { email, password } = registerData;
+    async registerWithEmailAndPassword(registerData: registerFormData) {
+      const { email, username, password } = registerData;
       try {
         this.isAuthenticating = true;
         await createUserWithEmailAndPassword(firebaseAuth, email, password);
         this.setUser(firebaseAuth.currentUser as User);
+        await this.updateUsername(username);
         router.push("/profile");
       } catch (error) {
-        switch (error) {
-          case "auth/email-already-in-use":
-            return "Email already in use";
-          case "auth/invalid-email":
-            return "Invalid email";
-          case "auth/weak-password":
-            return "Password is too weak";
-          case "auth/operation-not-allowed":
-            return "Operation not allowed";
-          default:
-            return "Email or password was incorrect";
+        const errorStore = useErrorStore();
+        if (error instanceof FirebaseError) {
+          switch (error.code) {
+            case "auth/email-already-in-use":
+              errorStore.displayError("Email already in use");
+              break;
+            case "auth/weak-password":
+              errorStore.displayError("Password is too weak");
+              break;
+            default:
+              errorStore.displayError("Email or password was incorrect");
+              break;
+          }
+        } else {
+          errorStore.displayError("An unknown error occurred");
         }
       } finally {
         this.isAuthenticating = false;
@@ -100,34 +121,39 @@ export const useAuthStore = defineStore({
       this.clearUser();
       router.push("/about");
     },
-    async updateEmail(email: string) {
+    async updateEmail(newEmail: string) {
       try {
-        await updateEmail(firebaseAuth.currentUser as User, email);
+        await updateEmail(firebaseAuth.currentUser as User, newEmail);
       } catch (error) {
-        alert(error);
+        if (error instanceof FirebaseError) console.error(error.message);
       }
     },
-    async updateDisplayName(displayName: string) {
+    async updateUsername(newUsername: string) {
       try {
         await updateProfile(firebaseAuth.currentUser as User, {
-          displayName,
+          displayName: newUsername,
         });
       } catch (error) {
-        alert(error);
+        if (error instanceof FirebaseError) console.error(error.message);
       }
     },
-    async updatePassword(password: string) {
+    async updatePassword(newPassword: string) {
       try {
-        await updatePassword(firebaseAuth.currentUser as User, password);
+        await updatePassword(firebaseAuth.currentUser as User, newPassword);
       } catch (error) {
-        alert(error);
+        if (error instanceof FirebaseError) console.error(error.message);
       }
     },
     async fetchUser() {
-      firebaseAuth.onAuthStateChanged(async (user) => {
+      firebaseAuth.onAuthStateChanged((user) => {
         if (!user) {
           this.clearUser;
-          router.push("/about");
+          if (
+            router.currentRoute.value.fullPath !== "/register" &&
+            router.currentRoute.value.fullPath !== "/login"
+          ) {
+            router.push("/about");
+          }
         } else {
           this.setUser(user);
           if (

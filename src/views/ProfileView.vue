@@ -1,7 +1,7 @@
 <template>
   <main class="grid gap-24">
     <div class="grid gap-4 m-6">
-      <h1 class="text-5xl">Welcome, {{ displayName }}</h1>
+      <h1 class="text-5xl">Welcome, {{ username }}</h1>
       <form @submit.prevent="handleEmailUpdate">
         <div class="flex items-center w-full">
           <AtSymbolIcon class="inline-block mr-1 h-7" />
@@ -28,28 +28,28 @@
           </div>
         </div>
       </form>
-      <form @submit.prevent="handleDisplayNameUpdate">
+      <form @submit.prevent="handleusernameUpdate">
         <div class="flex items-center w-full">
           <UserIcon class="inline-block mr-1 h-7" />
-          <label for="displayName" class="sr-only"></label>
+          <label for="username" class="sr-only"></label>
           <input
-            id="displayName"
-            name="displayName"
+            id="username"
+            name="username"
             type="text"
             placeholder="username"
             autocomplete="username"
             class="block w-full border-0 border-b-2 border-purple-400"
             maxlength="21"
-            v-model="displayName"
+            v-model="username"
           />
           <div class="ml-auto">
             <input
               type="submit"
               :class="{
-                'opacity-50': displayName === authStore.user?.displayName,
+                'opacity-50': username === authStore.user?.displayName,
               }"
               class="p-2 ml-2 text-white transition bg-purple-400 rounded-lg hover:cursor-pointer hover:scale-105"
-              :disabled="displayName === authStore.user?.displayName"
+              :disabled="username === authStore.user?.displayName"
               value="Change username"
             />
           </div>
@@ -110,7 +110,7 @@ onMounted(() => {
     () => authStore.user,
     (user) => {
       if (user) {
-        displayName.value = user.displayName;
+        username.value = user.displayName;
         email.value = user.email;
       }
     },
@@ -121,7 +121,7 @@ onMounted(() => {
 const authStore = useAuthStore();
 
 const email = ref();
-const displayName = ref();
+const username = ref();
 const currentPassword = ref();
 const newPassword = ref();
 
@@ -131,9 +131,9 @@ const handleEmailUpdate = () => {
     : alert("You have already used this email");
 };
 
-const handleDisplayNameUpdate = () => {
-  displayName.value && displayName.value !== authStore.user?.displayName
-    ? authStore.updateDisplayName(displayName.value)
+const handleusernameUpdate = () => {
+  username.value && username.value !== authStore.user?.displayName
+    ? authStore.updateUsername(username.value)
     : alert("Username is the same");
 };
 

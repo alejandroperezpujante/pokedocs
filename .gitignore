@@ -17,6 +17,7 @@ coverage
 .firebase*
 storage.rules
 firestore*
+functions
 
 /cypress/videos/
 /cypress/screenshots/
