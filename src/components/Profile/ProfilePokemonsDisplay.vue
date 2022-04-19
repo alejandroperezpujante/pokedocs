@@ -10,25 +10,43 @@
     >
       <div class="flex flex-col items-center justify-center gap-2">
         <h2 class="text-4xl">
-          {{ pokemon.name }}
+          {{
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            pokemon.name
+          }}
         </h2>
         <img
-          :src="`${pokemon.sprite}`"
+          :src="`${
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            pokemon.sprite
+          }`"
           class="object-cover w-16 h-auto bg-gray-100 rounded-lg"
-          :alt="`Sprite of ${pokemon.name}`"
+          :alt="`Sprite of ${
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            pokemon.name
+          }`"
         />
       </div>
-      <RouterLink
-        :to="`/pokemon/${pokemon.id}`"
-        class="p-2 bg-teal-300 rounded-md"
-        >Details</RouterLink
+      <button
+        @click="
+          profileStore.deletePokemon(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            pokemon.id
+          )
+        "
+        class="p-1 font-bold text-white transition bg-red-500 rounded-lg hover:scale-110"
       >
+        Delete
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from "vue-router";
 import { useProfileStore } from "@/stores/profileStore";
 
 const profileStore = useProfileStore();

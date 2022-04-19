@@ -6,15 +6,8 @@ import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
 export interface createStoreStateType {
   name: string;
   sprite: string | ArrayBuffer | null;
-  rawSprite: any;
-  stats: [
-    { name: string; value: number },
-    { name: string; value: number },
-    { name: string; value: number },
-    { name: string; value: number },
-    { name: string; value: number },
-    { name: string; value: number }
-  ];
+  rawSprite: File | undefined;
+  stats: { name: string; value: number }[];
   weight: number;
   height: number;
   types: string[];
@@ -51,7 +44,7 @@ export const useCreateStore = defineStore({
   actions: {
     async createPokemon(): Promise<void> {
       try {
-        const docRef = await addDoc(collection(firebaseDb, "pokemons"), {
+        await addDoc(collection(firebaseDb, "pokemons"), {
           userUid: firebaseAuth.currentUser?.uid,
           name: this.name,
           weight: this.weight,
@@ -61,7 +54,6 @@ export const useCreateStore = defineStore({
           abilities: this.abilities,
           sprite: await this.uploadPokemonSprite(),
         });
-        console.log("Document written with ID: ", docRef.id);
       } catch (error) {
         alert(error);
       }
@@ -72,7 +64,7 @@ export const useCreateStore = defineStore({
         `pokemonsSprites/${firebaseAuth.currentUser?.uid}/${this.name}`
       );
       try {
-        await uploadBytes(storageRef, this.rawSprite);
+        await uploadBytes(storageRef, this.rawSprite as File);
         return await getDownloadURL(storageRef);
       } catch (error) {
         console.error(error);

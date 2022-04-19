@@ -17,11 +17,14 @@
   "dependencies": {
     "@headlessui/vue": "^1.5.0",
     "@heroicons/vue": "^1.0.6",
+    "algoliasearch": "^4.13.0",
     "axios": "^0.26.1",
     "firebase": "^9.6.10",
+    "instantsearch.css": "^7.4.5",
     "pinia": "^2.0.13",
     "pokenode-ts": "^1.13.0",
     "vue": "^3.2.31",
+    "vue-instantsearch": "^4.3.3",
     "vue-router": "^4.0.14"
   },
   "devDependencies": {

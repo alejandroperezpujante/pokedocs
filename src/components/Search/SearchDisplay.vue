@@ -10,12 +10,12 @@
               searchStore.searchResults.name.slice(1)
             }}
           </h2>
-          <p class="font-mono text-gray-400">
+          <p v-if="!searchStore.searchMode" class="font-mono text-gray-400">
             #{{ searchStore.searchResults.id.toString().padStart(3, "0") }}
           </p>
           <img
             :src="(searchStore.searchResults.sprite as string)"
-            class="bg-gray-100 rounded-lg"
+            class="h-auto bg-gray-100 rounded-lg w-28"
             :alt="`Sprite of ${searchStore.searchResults.name}`"
           />
         </div>
@@ -61,7 +61,7 @@
                 <p class="text-white">
                   {{ stat.name[0].toUpperCase() + stat.name.slice(1) }}
                 </p>
-                <p class="text-sm">{{ stat.base_stat }}</p>
+                <p class="text-sm">{{ stat.value }}</p>
               </div>
             </div>
           </div>

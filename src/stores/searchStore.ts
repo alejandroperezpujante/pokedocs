@@ -1,12 +1,15 @@
-import { PokemonClient } from "pokenode-ts";
 import { defineStore } from "pinia";
+import { PokemonClient } from "pokenode-ts";
+import { firebaseDb } from "@/firebase";
+import { collection, query, where, getDocs } from "@firebase/firestore";
 
-interface searchResult {
+interface searchStoreState {
+  searchMode: boolean;
   isSearching: boolean;
   searchResults:
     | undefined
     | {
-        id: number;
+        id: string;
         name: string;
         height: number;
         weight: number;
@@ -19,10 +22,16 @@ interface searchResult {
 
 export const useSearchStore = defineStore({
   id: "searchStore",
-  state: (): searchResult => ({
+  state: (): searchStoreState => ({
+    searchMode: false,
     searchResults: undefined,
     isSearching: false,
   }),
+  getters: {
+    getSearchMode(state): boolean {
+      return state.searchMode;
+    },
+  },
   actions: {
     async searchPokeApi(pokemonName: string) {
       this.isSearching = true;
@@ -44,7 +53,28 @@ export const useSearchStore = defineStore({
           types: response.types.map((type) => type.type.name),
           sprite: response.sprites.front_default,
         };
+        console.info(searchResult);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         this.searchResults = searchResult;
+      } catch (error) {
+        console.error(error);
+      } finally {
+        this.isSearching = false;
+      }
+    },
+    async searchPokedocs(pokemonName: string) {
+      this.isSearching = true;
+      try {
+        const docRef = collection(firebaseDb, "pokemons");
+        const q = query(docRef, where("name", "==", pokemonName));
+        const querySnapshot = await getDocs(q);
+        const documentId = querySnapshot.docs[0].id;
+        const searchResult = querySnapshot.docs[0].data();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        this.searchResults = { ...searchResult, id: documentId };
+        console.log(this.searchResults);
       } catch (error) {
         console.error(error);
       } finally {

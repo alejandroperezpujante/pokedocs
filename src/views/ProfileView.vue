@@ -2,7 +2,7 @@
   <main class="grid gap-24">
     <div class="grid gap-4 m-6">
       <h1 class="text-5xl">Welcome, {{ username }}</h1>
-      <form @submit.prevent="handleEmailUpdate">
+      <form @submit.prevent="handleUpdateEmail">
         <div class="flex items-center w-full">
           <AtSymbolIcon class="inline-block mr-1 h-7" />
           <label for="email" class="sr-only"></label>
@@ -28,7 +28,7 @@
           </div>
         </div>
       </form>
-      <form @submit.prevent="handleusernameUpdate">
+      <form @submit.prevent="handleUpdateUsername">
         <div class="flex items-center w-full">
           <UserIcon class="inline-block mr-1 h-7" />
           <label for="username" class="sr-only"></label>
@@ -99,14 +99,22 @@
 </template>
 
 <script setup lang="ts">
+// Vue methods
 import { ref, watch, onBeforeMount } from "vue";
-import { firebaseDb } from "@/firebase";
-import { collection, query, where, getDocs } from "@firebase/firestore";
+
+// Pinia stores
 import { useAuthStore } from "@/stores/authStore";
-import { AtSymbolIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/solid";
 import { useProfileStore } from "@/stores/profileStore";
+
+// Firebase instances and methods
+import { firebaseDb } from "@/firebase";
+import { collection, query, where, onSnapshot } from "@firebase/firestore";
+
+// Vue components
+import { AtSymbolIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/solid";
 import ProfilePokemonsDisplay from "@/components/Profile/ProfilePokemonsDisplay.vue";
 
+// Watcher for user data and Firestore data
 onBeforeMount(async () => {
   watch(
     () => authStore.user,
@@ -118,8 +126,13 @@ onBeforeMount(async () => {
           const docRef = collection(firebaseDb, "pokemons");
           const q = query(docRef, where("userUid", "==", authStore.user?.uid));
           try {
-            const querySnapshot = await getDocs(q);
-            profileStore.pokemons = querySnapshot.docs.map((doc) => doc.data());
+            onSnapshot(q, (snapshot) => {
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              profileStore.pokemons = snapshot.docs.map((doc) => {
+                return { id: doc.id, ...doc.data() };
+              });
+            });
           } catch (error) {
             console.error(error);
           }
@@ -138,21 +151,21 @@ const username = ref();
 const currentPassword = ref();
 const newPassword = ref();
 
-const handleEmailUpdate = async () => {
+const handleUpdateEmail = async () => {
   email.value && email.value !== authStore.user?.email
-    ? await authStore.updateEmail(email.value)
+    ? await profileStore.changeUserEmail(email.value)
     : alert("You have already used this email");
 };
 
-const handleusernameUpdate = async () => {
+const handleUpdateUsername = async () => {
   username.value && username.value !== authStore.user?.displayName
-    ? await authStore.updateUsername(username.value)
+    ? await profileStore.changeUserPassword(username.value)
     : alert("Username is the same");
 };
 
 const handleUpdatePassword = async () => {
   newPassword.value && currentPassword.value !== newPassword.value
-    ? await authStore.updatePassword(newPassword.value)
+    ? await profileStore.changeUserPassword(newPassword.value)
     : alert("Passwords are the same");
 };
 </script>

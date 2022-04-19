@@ -7,13 +7,11 @@ import {
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup,
-  updateEmail,
-  updatePassword,
-  updateProfile,
   signOut,
   type User,
 } from "@firebase/auth";
 import { FirebaseError } from "@firebase/util";
+import { useProfileStore } from "./profileStore";
 
 interface userData {
   user: User | null;
@@ -78,9 +76,13 @@ export const useAuthStore = defineStore({
       const { email, username, password } = registerData;
       try {
         this.isAuthenticating = true;
+        // Create user and set store user to the new user
         await createUserWithEmailAndPassword(firebaseAuth, email, password);
         this.setUser(firebaseAuth.currentUser as User);
-        await this.updateUsername(username);
+
+        // Set user's username
+        const profileStore = useProfileStore();
+        await profileStore.changeUserUsername(username);
         router.push("/profile");
       } catch (error) {
         const errorStore = useErrorStore();
@@ -121,29 +123,6 @@ export const useAuthStore = defineStore({
       this.clearUser();
       router.push("/about");
     },
-    async updateEmail(newEmail: string) {
-      try {
-        await updateEmail(firebaseAuth.currentUser as User, newEmail);
-      } catch (error) {
-        if (error instanceof FirebaseError) console.error(error.message);
-      }
-    },
-    async updateUsername(newUsername: string) {
-      try {
-        await updateProfile(firebaseAuth.currentUser as User, {
-          displayName: newUsername,
-        });
-      } catch (error) {
-        if (error instanceof FirebaseError) console.error(error.message);
-      }
-    },
-    async updatePassword(newPassword: string) {
-      try {
-        await updatePassword(firebaseAuth.currentUser as User, newPassword);
-      } catch (error) {
-        if (error instanceof FirebaseError) console.error(error.message);
-      }
-    },
     async fetchUser() {
       firebaseAuth.onAuthStateChanged((user) => {
         if (!user) {
@@ -157,8 +136,9 @@ export const useAuthStore = defineStore({
         } else {
           this.setUser(user);
           if (
-            router.currentRoute.value.path === "/login" ||
-            router.currentRoute.value.path === "/register"
+            (router.currentRoute.value.path === "/login" ||
+              router.currentRoute.value.path === "/register") &&
+            user.emailVerified
           ) {
             router.push("/profile");
           }
