@@ -1,10 +1,6 @@
 <template>
   <HeaderComponent />
-  <RouterView v-slot="{ Component }">
-    <Transition mode="out-in">
-      <component :is="Component" />
-    </Transition>
-  </RouterView>
+  <RouterView />
   <FooterComponent />
 </template>
 
@@ -21,15 +17,3 @@ onBeforeMount(() => {
   authStore.fetchUser();
 });
 </script>
-
-<style scoped>
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
-</style>

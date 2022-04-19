@@ -6,7 +6,7 @@ interface errorState {
 }
 
 export const useErrorStore = defineStore({
-  id: "error",
+  id: "errorStore",
   state: (): errorState => ({
     isError: false,
     errorMessage: null,

@@ -31,7 +31,7 @@ interface logInFormData {
 }
 
 export const useAuthStore = defineStore({
-  id: "auth",
+  id: "authStore",
   state: (): userData => ({
     user: null,
     isAuthenticating: false,

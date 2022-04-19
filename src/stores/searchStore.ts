@@ -18,7 +18,7 @@ interface searchResult {
 }
 
 export const useSearchStore = defineStore({
-  id: "search",
+  id: "searchStore",
   state: (): searchResult => ({
     searchResults: undefined,
     isSearching: false,

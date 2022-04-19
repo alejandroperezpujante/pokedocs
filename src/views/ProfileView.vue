@@ -94,24 +94,36 @@
         </div>
       </form>
     </div>
-    <div class="grid place-content-center">
-      <h2>My Pokemons will be displayed here</h2>
-    </div>
+    <ProfilePokemonsDisplay />
   </main>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, watch, onBeforeMount } from "vue";
+import { firebaseDb } from "@/firebase";
+import { collection, query, where, getDocs } from "@firebase/firestore";
 import { useAuthStore } from "@/stores/authStore";
 import { AtSymbolIcon, LockClosedIcon, UserIcon } from "@heroicons/vue/solid";
+import { useProfileStore } from "@/stores/profileStore";
+import ProfilePokemonsDisplay from "@/components/Profile/ProfilePokemonsDisplay.vue";
 
-onMounted(() => {
+onBeforeMount(async () => {
   watch(
     () => authStore.user,
-    (user) => {
+    async (user) => {
       if (user) {
         username.value = user.displayName;
         email.value = user.email;
+        if (!profileStore.pokemons) {
+          const docRef = collection(firebaseDb, "pokemons");
+          const q = query(docRef, where("userUid", "==", authStore.user?.uid));
+          try {
+            const querySnapshot = await getDocs(q);
+            profileStore.pokemons = querySnapshot.docs.map((doc) => doc.data());
+          } catch (error) {
+            console.error(error);
+          }
+        }
       }
     },
     { immediate: true }
@@ -119,27 +131,28 @@ onMounted(() => {
 });
 
 const authStore = useAuthStore();
+const profileStore = useProfileStore();
 
 const email = ref();
 const username = ref();
 const currentPassword = ref();
 const newPassword = ref();
 
-const handleEmailUpdate = () => {
+const handleEmailUpdate = async () => {
   email.value && email.value !== authStore.user?.email
-    ? authStore.updateEmail(email.value)
+    ? await authStore.updateEmail(email.value)
     : alert("You have already used this email");
 };
 
-const handleusernameUpdate = () => {
+const handleusernameUpdate = async () => {
   username.value && username.value !== authStore.user?.displayName
-    ? authStore.updateUsername(username.value)
+    ? await authStore.updateUsername(username.value)
     : alert("Username is the same");
 };
 
-const handleUpdatePassword = () => {
+const handleUpdatePassword = async () => {
   newPassword.value && currentPassword.value !== newPassword.value
-    ? authStore.updatePassword(newPassword.value)
+    ? await authStore.updatePassword(newPassword.value)
     : alert("Passwords are the same");
 };
 </script>
