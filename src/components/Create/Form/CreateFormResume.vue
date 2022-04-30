@@ -1,6 +1,5 @@
 <template>
-  <h1 class="text-5xl font-bold text-center">Pokemon Resume</h1>
-  <div class="grid gap-2 sm:grid-cols-2">
+  <div class="grid gap-2 mt-4 sm:grid-cols-2">
     <div class="grid gap-2">
       <div class="mx-auto">
         <h2 class="text-4xl">
@@ -62,7 +61,7 @@
   </div>
   <input
     type="submit"
-    class="p-2 mx-auto border w-fit"
+    class="p-2 mx-auto border rounded-md w-fit hover:cursor-pointer"
     value="Create Pokemon"
   />
 </template>

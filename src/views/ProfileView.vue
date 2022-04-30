@@ -133,8 +133,8 @@ onBeforeMount(async () => {
                 return { id: doc.id, ...doc.data() };
               });
             });
-          } catch (error) {
-            console.error(error);
+          } catch (e) {
+            return;
           }
         }
       }
@@ -159,7 +159,7 @@ const handleUpdateEmail = async () => {
 
 const handleUpdateUsername = async () => {
   username.value && username.value !== authStore.user?.displayName
-    ? await profileStore.changeUserPassword(username.value)
+    ? await profileStore.changeUserUsername(username.value)
     : alert("Username is the same");
 };
 

@@ -20,6 +20,7 @@
     "algoliasearch": "^4.13.0",
     "axios": "^0.26.1",
     "firebase": "^9.6.10",
+    "html2canvas": "^1.4.1",
     "instantsearch.css": "^7.4.5",
     "pinia": "^2.0.13",
     "pokenode-ts": "^1.13.0",

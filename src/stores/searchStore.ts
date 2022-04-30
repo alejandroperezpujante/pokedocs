@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { PokemonClient } from "pokenode-ts";
 import { firebaseDb } from "@/firebase";
 import { collection, query, where, getDocs } from "@firebase/firestore";
+import { useErrorStore } from "./errorStore";
 
 interface searchStoreState {
   searchMode: boolean;
@@ -27,11 +28,6 @@ export const useSearchStore = defineStore({
     searchResults: undefined,
     isSearching: false,
   }),
-  getters: {
-    getSearchMode(state): boolean {
-      return state.searchMode;
-    },
-  },
   actions: {
     async searchPokeApi(pokemonName: string) {
       this.isSearching = true;
@@ -53,12 +49,12 @@ export const useSearchStore = defineStore({
           types: response.types.map((type) => type.type.name),
           sprite: response.sprites.front_default,
         };
-        console.info(searchResult);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         this.searchResults = searchResult;
       } catch (error) {
-        console.error(error);
+        const errorStore = useErrorStore();
+        errorStore.displayError("Sorry, we couldn't find that pokemon");
       } finally {
         this.isSearching = false;
       }
@@ -74,9 +70,9 @@ export const useSearchStore = defineStore({
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         this.searchResults = { ...searchResult, id: documentId };
-        console.log(this.searchResults);
       } catch (error) {
-        console.error(error);
+        const errorStore = useErrorStore();
+        errorStore.displayError("Sorry, we couldn't find that pokemon");
       } finally {
         this.isSearching = false;
       }

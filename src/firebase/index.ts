@@ -14,11 +14,10 @@ const firebaseConfig = {
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
-
 const firebaseAuth = getAuth(firebaseApp);
-const firebaseDb = getFirestore();
-const firebaseStorage = getStorage();
-const firebaseFunctions = getFunctions();
+const firebaseDb = getFirestore(firebaseApp);
+const firebaseStorage = getStorage(firebaseApp);
+const firebaseFunctions = getFunctions(firebaseApp);
 
 if (!import.meta.env.PROD) {
   connectAuthEmulator(firebaseAuth, "http://localhost:9099");

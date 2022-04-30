@@ -1,7 +1,9 @@
 import { defineStore } from "pinia";
+import { useErrorStore } from "@/stores/errorStore";
 import { firebaseDb, firebaseAuth, firebaseStorage } from "@/firebase";
 import { addDoc, collection } from "@firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "@firebase/storage";
+import router from "@/router";
 
 export interface createStoreStateType {
   name: string;
@@ -42,6 +44,23 @@ export const useCreateStore = defineStore({
     },
   },
   actions: {
+    clearForm(): void {
+      this.$state.name = "";
+      this.$state.weight = 0;
+      this.$state.height = 0;
+      this.$state.stats = [
+        { name: "HP", value: 0 },
+        { name: "Attack", value: 0 },
+        { name: "Defense", value: 0 },
+        { name: "Special Attack", value: 0 },
+        { name: "Special Defense", value: 0 },
+        { name: "Speed", value: 0 },
+      ];
+      this.$state.types = [""];
+      this.$state.abilities = [""];
+      this.$state.sprite = "";
+      this.$state.rawSprite = undefined;
+    },
     async createPokemon(): Promise<void> {
       try {
         await addDoc(collection(firebaseDb, "pokemons"), {
@@ -54,11 +73,14 @@ export const useCreateStore = defineStore({
           abilities: this.abilities,
           sprite: await this.uploadPokemonSprite(),
         });
+        this.clearForm();
+        router.push("/profile");
       } catch (error) {
-        alert(error);
+        const errorStore = useErrorStore();
+        errorStore.displayError("Your pokemon could not be created, try again");
       }
     },
-    async uploadPokemonSprite(): Promise<string> {
+    async uploadPokemonSprite(): Promise<string | void> {
       const storageRef = ref(
         firebaseStorage,
         `pokemonsSprites/${firebaseAuth.currentUser?.uid}/${this.name}`
@@ -67,8 +89,8 @@ export const useCreateStore = defineStore({
         await uploadBytes(storageRef, this.rawSprite as File);
         return await getDownloadURL(storageRef);
       } catch (error) {
-        console.error(error);
-        throw error;
+        const errorStore = useErrorStore();
+        errorStore.displayError("The sprite could't be uploaded");
       }
     },
   },

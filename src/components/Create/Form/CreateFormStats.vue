@@ -1,6 +1,6 @@
 <template>
   <h2 class="font-mono text-3xl text-center">Stats</h2>
-  <div class="grid gap-4 mx-auto sm:grid-cols-3">
+  <div class="grid grid-cols-2 gap-4 mx-auto sm:grid-cols-3">
     <div class="grid w-fit">
       <label for="hp">HP</label>
       <input

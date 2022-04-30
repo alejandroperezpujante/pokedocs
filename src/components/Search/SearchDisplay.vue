@@ -1,7 +1,11 @@
 <template>
-  <div class="grid gap-4 place-content-center">
+  <div class="grid gap-4 p-2 place-content-center">
     <LoadingIcon />
-    <div class="grid gap-2 sm:grid-cols-2" v-if="searchStore.searchResults">
+    <div
+      class="grid gap-2 sm:grid-cols-2"
+      v-if="searchStore.searchResults"
+      ref="pokedocsDisplayRef"
+    >
       <div class="grid gap-2">
         <div class="mx-auto">
           <h2 class="text-4xl">
@@ -61,7 +65,7 @@
                 <p class="text-white">
                   {{ stat.name[0].toUpperCase() + stat.name.slice(1) }}
                 </p>
-                <p class="text-sm">{{ stat.value }}</p>
+                <p class="text-sm">{{ stat.base_stat }}</p>
               </div>
             </div>
           </div>
@@ -75,11 +79,33 @@
       </div>
     </div>
   </div>
+  <button
+    v-if="searchStore.searchResults"
+    @click="handlePokemonScreenshot"
+    class="px-1 py-2 mx-auto font-bold transition-transform duration-200 bg-red-400 border rounded-lg w-fit hover:scale-110"
+  >
+    Save ScreenShot
+  </button>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { useSearchStore } from "@/stores/searchStore";
 import LoadingIcon from "@/components/Icons/LoadingIcon.vue";
+import html2canvas from "html2canvas";
+
+const pokedocsDisplayRef = ref<HTMLElement>();
 
 const searchStore = useSearchStore();
+
+const handlePokemonScreenshot = async () => {
+  const canvas = await html2canvas(pokedocsDisplayRef.value as HTMLElement, {
+    allowTaint: false,
+    useCORS: true,
+  });
+  const link = document.createElement("a");
+  link.href = canvas.toDataURL("image/png");
+  link.download = `${searchStore.searchResults?.name}.png`;
+  link.click();
+};
 </script>

@@ -1,8 +1,31 @@
 <template>
   <main class="grid gap-4">
     <ErrorMessageComponent />
-    <form @submit.prevent="handleCreationForm">
-      <div class="grid gap-4 mx-2">
+    <div class="flex items-center justify-center gap-2">
+      <div class="w-12 h-1 transition-colors bg-blue-400 border"></div>
+      <div
+        class="w-12 h-1 transition-colors border"
+        :class="{ 'bg-blue-400': formStep >= 1, 'bg-black': formStep < 1 }"
+      ></div>
+      <div
+        class="w-12 h-1 transition-colors border"
+        :class="{ 'bg-blue-400': formStep >= 2, 'bg-black': formStep < 2 }"
+      ></div>
+      <div
+        class="w-12 h-1 transition-colors border"
+        :class="{ 'bg-blue-400': formStep >= 3, 'bg-black': formStep < 3 }"
+      ></div>
+      <div
+        class="w-12 h-1 transition-colors border"
+        :class="{ 'bg-blue-400': formStep >= 4, 'bg-black': formStep < 4 }"
+      ></div>
+      <div
+        class="w-12 h-1 transition-colors border"
+        :class="{ 'bg-blue-400': formStep >= 5, 'bg-black': formStep < 5 }"
+      ></div>
+    </div>
+    <form @submit.prevent="createStore.createPokemon()">
+      <div class="grid place-content-center gap-4 mx-2 h-[400px]">
         <CreateFormBasic v-if="formStep === 0" />
         <CreateFormStats v-if="formStep === 1" />
         <CreateFormTypes v-if="formStep === 2" />
@@ -11,7 +34,7 @@
         <CreateFormResume v-if="formStep === 5" />
       </div>
     </form>
-    <div class="flex items-center justify-center gap-2">
+    <div class="flex items-center justify-center gap-2 mt-12">
       <button
         @click="handlePreviousFormStep"
         class="transition bg-cyan-400"
@@ -46,22 +69,20 @@ import CreateFormResume from "@/components/Create/Form/CreateFormResume.vue";
 
 const createStore = useCreateStore();
 const errorStore = useErrorStore();
-const formStep: Ref<number> = ref<number>(0);
-
-const handleCreationForm = async (): Promise<void> => {
-  createStore.createPokemon();
-};
+const formStep = ref<number>(0);
 
 const handlePreviousFormStep = (): void => {
   formStep.value === 0
     ? errorStore.displayError("You can't go back from this step")
     : formStep.value--;
+  console.log(formStep.value);
 };
 
 const handleNextFormStep = (): void => {
   formStep.value === 5
     ? errorStore.displayError("You can't go forward from this step")
     : formStep.value++;
+  console.log(formStep.value);
 };
 </script>
 
